@@ -1,7 +1,5 @@
 # Implementation plan
 
----
-
 ## 📘 1. Pregled projekta
 
 Cilj projekta je osmisliti i implementirati **sustav za upravljanje identitetima i autentifikacijom (IAM – Identity and Authentication Management)** koristeći **open-source tehnologije**.
@@ -9,8 +7,6 @@ Sustav omogućava sigurno upravljanje korisnicima, grupama, lozinkama te višefa
 Kroz projekt se povezuje teorijsko znanje o sigurnosnim mehanizmima s praktičnom implementacijom u stvarnom okruženju.
 
 Projekt se provodi u sklopu kolegija **Sigurnost informacijskih sustava**, a cilj je razumjeti i prikazati principe sigurnog pristupa i kontrole identiteta u informatičkim sustavima.
-
----
 
 ## 🎯 2. Glavni ciljevi
 
@@ -20,8 +16,6 @@ Projekt se provodi u sklopu kolegija **Sigurnost informacijskih sustava**, a cil
 4. Osigurati dvofaktorsku autentifikaciju i politiku lozinki.
 5. Testirati otpornost sustava na tipične sigurnosne napade (npr. brute-force).
 6. Evaluirati učinkovitost i sigurnost rješenja.
-
----
 
 ## ⚙️ 3. Struktura projekta
 
@@ -44,8 +38,6 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
   * **FreeOTP / Google Authenticator** – za dvofaktorsku autentifikaciju (2FA).
 * Testiranje sigurnosti sustava i performansi.
 
----
-
 ## 🧭 4. Plan rada po fazama
 
 | Faza                                     | Opis                                                                     | Alati / tehnologije                        | Očekivani rezultat                               |
@@ -56,8 +48,6 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
 | **4. Konfiguracija sigurnosnih pravila** | Postavljanje password policy-a, 2FA autentifikacije i korisničkih prava. | FreeIPA, FreeOTP                           | Uspješno implementirana sigurnosna pravila.      |
 | **5. Testiranje**                        | Testiranje autentifikacije, provjera 2FA, pokušaji brute-force napada.   | Hydra, custom skripte                      | Analiza otpornosti sustava.                      |
 | **6. Evaluacija**                        | Procjena stabilnosti i sigurnosti sustava, izrada zaključaka.            | Dokumentacija                              | Završni izvještaj s prijedlozima poboljšanja.    |
-
----
 
 ## 🧠 5. Obrazloženje izbora tehnologija
 
@@ -70,8 +60,6 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
 | **Linux (Ubuntu / Fedora)**        | Operativni sustav za implementaciju i testiranje.                       | Otvorena platforma s podrškom za sve potrebne alate i servise.                                            |
 | **Hydra / testne skripte**         | Testiranje otpornosti na brute-force napade.                            | Omogućuju realno testiranje sigurnosnih mehanizama.                                                       |
 
----
-
 ## 🔒 6. Očekivani rezultati
 
 * Funkcionalan IAM sustav koji omogućava sigurno upravljanje korisnicima i autentifikacijom.
@@ -79,8 +67,6 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
 * Dokumentirana arhitektura i koraci implementacije.
 * Rezultati testiranja sigurnosti i analiza ranjivosti.
 * Prijedlozi za unaprjeđenje i mogućnosti daljnjeg razvoja (npr. integracija s Active Directoryjem ili cloud servisima).
-
----
 
 ## 🚀 7. Zaključak
 
