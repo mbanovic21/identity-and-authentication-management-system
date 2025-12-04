@@ -9,7 +9,7 @@ set -euo pipefail
 HOSTNAME_FQDN="ipa1.iam.lab"   # Server FQDN
 DOMAIN="iam.lab"               # DNS domain
 REALM="IAM.LAB"                # Kerberos realm (UPPERCASE)
-IP_ADDR="192.168.1.200"        # FreeIPA server Host-only IP
+IP_ADDR="192.168.1.220"        # FreeIPA server Host-only IP
 TIMEZONE="Europe/Zagreb"       # Timezone
 
 ### FUNCTIONS ###
