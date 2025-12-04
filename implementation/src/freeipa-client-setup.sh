@@ -7,7 +7,7 @@ set -euo pipefail
 
 ### CONFIG – ADJUST FOR YOUR ENVIRONMENT ###
 IPA_SERVER_FQDN="ipa1.iam.lab"
-IPA_SERVER_IP="192.168.1.200"
+IPA_SERVER_IP="192.168.1.220"
 DOMAIN="iam.lab"
 REALM="IAM.LAB"
 TIMEZONE="Europe/Zagreb"
