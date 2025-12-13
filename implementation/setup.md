@@ -508,7 +508,7 @@ ipa sudorule-add-user sysadmin_all --groups=sysadmins
 Ograničeni skup naredbi vezanih uz web server za grupu `webadmins`:
 
 ```bash
-ipa sudorule-add webadmin_http --runasusercat=all --runasgroupcat=all
+ipa sudorule-add webadmin_http --hostcat=all --runasusercat=all --runasgroupcat=all
 ipa sudocmdgroup-add webadmin_cmds --desc="Web Commands"
 ipa sudocmd-add /usr/bin/systemctl
 ipa sudocmd-add /usr/sbin/nginx
@@ -523,7 +523,7 @@ ipa sudorule-add-user webadmin_http --groups=webadmins
 Dijagnostičke/monitoring naredbe za grupu `itsupport`:
 
 ```bash
-ipa sudorule-add itsupport_limited --runasusercat=all --runasgroupcat=all
+ipa sudorule-add itsupport_limited --hostcat=all --runasusercat=all --runasgroupcat=all
 ipa sudocmdgroup-add itsupport_cmds --desc="IT Support Commands"
 ipa sudocmd-add /usr/bin/journalctl
 ipa sudocmd-add /usr/sbin/ss
