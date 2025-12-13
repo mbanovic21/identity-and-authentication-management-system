@@ -423,3 +423,133 @@ Tijekom `ipa-client-install` klijent će koristiti:
 * server: `ipa1.iam.lab`,
 * realm: `IAM.LAB`,
 * korisnika `admin` za enrolment.
+
+# 2. Upravljanje identitetima i pristupom – Users, Groups & PoLP
+
+**Autor:** _Lana Ljubičić_  
+**Uloga:** Član 2 – Inženjer za identitete i upravljanje pristupom  
+**Tehnologije:** VirtualBox, Rocky Linux 9, FreeIPA
+
+Ovaj dio opisuje konkretne korake za reprodukciju konfiguracije korisnika, grupa i sudo pravila u FreeIPA serveru. Pretpostavlja se da je FreeIPA server već instaliran i inicijalno konfiguriran (koraci člana 1) te da je administrator prijavljen kao `admin`.
+
+## 0. Priprema
+
+```bash
+kinit admin
+```
+
+(_unesite lozinku za admin korisnika_)
+
+## 1. Kreiranje korisnika
+
+Sljedeće naredbe kreiraju testne korisnike koji će se koristiti za provjeru PoLP-a (za svakog korisnika potrebno je kreirati lozinku):
+
+```bash
+ipa user-add ivana --first=Ivana --last=Ivic --email=ivana@iam.lab --password 
+ipa user-add ivo --first=Ivo --last=Ivanic --email=ivo@iam.lab --password
+ipa user-add marija --first=Marija --last=Maric --email=marija@iam.lab --password
+ipa user-add marta --first=Marta --last=Miric --email=marta@iam.lab --password
+ipa user-add pero --first=Pero --last=Peric --email=pero@iam.lab --password
+ipa user-add david --first=David --last=Horvat --email=david@iam.lab --password
+ipa user-add ana --first=Ana --last=Anic --email=ana@iam.lab --password
+```
+
+Nakon kreiranja korisnika može se provjeriti stanje:
+
+`ipa user-find`
+
+## 2. Kreiranje grupa i dodavanje članova
+
+Definiraju se četiri uloge u obliku FreeIPA grupa i članovi tih grupa:
+
+Kreiranje grupa
+```bash
+ipa group-add sysadmins --desc="System Administrators"
+ipa group-add developers --desc="Developers"
+ipa group-add webadmins --desc="Web Server Admins"
+ipa group-add itsupport --desc="IT Support Team"
+```
+
+Dodavanje korisnika u grupe
+```bash
+ipa group-add-member sysadmins --users=ivana
+ipa group-add-member sysadmins --users=marta
+ipa group-add-member developers --users=ivo
+ipa group-add-member developers --users=marija
+ipa group-add-member developers --users=pero
+ipa group-add-member webadmins --users=ana
+ipa group-add-member itsupport --users=marta
+ipa group-add-member itsupport --users=david
+```
+
+Provjera grupa i članova:
+
+```bash
+ipa group-find
+ipa group-show sysadmins
+ipa group-show developers
+ipa group-show webadmins
+ipa group-show itsupport
+```
+
+## 3. Sudo pravila (PoLP)
+
+### 3.1 System administrators – `sysadmin_all`
+
+Puno sudo pravo za članove `sysadmins`:
+
+```bash
+ipa sudorule-add sysadmin_all --hostcat=all --runasusercat=all --runasgroupcat=all --cmdcat=all
+ipa sudorule-add-user sysadmin_all --groups=sysadmins
+```
+
+### 3.2 Web administrators – `webadmin_http`
+
+Ograničeni skup naredbi vezanih uz web server za grupu `webadmins`:
+
+```bash
+ipa sudorule-add webadmin_http --runasusercat=all --runasgroupcat=all
+ipa sudocmdgroup-add webadmin_cmds --desc="Web Commands"
+ipa sudocmd-add /usr/bin/systemctl
+ipa sudocmd-add /usr/sbin/nginx
+ipa sudocmdgroup-add-member webadmin_cmds --sudocmds="/usr/bin/systemctl"
+ipa sudocmdgroup-add-member webadmin_cmds --sudocmds="/usr/sbin/nginx"
+ipa sudorule-add-allow-command webadmin_http --sudocmdgroups=webadmin_cmds
+ipa sudorule-add-user webadmin_http --groups=webadmins
+```
+
+### 3.3 IT support – `itsupport_limited`
+
+Dijagnostičke/monitoring naredbe za grupu `itsupport`:
+
+```bash
+ipa sudorule-add itsupport_limited --runasusercat=all --runasgroupcat=all
+ipa sudocmdgroup-add itsupport_cmds --desc="IT Support Commands"
+ipa sudocmd-add /usr/bin/journalctl
+ipa sudocmd-add /usr/sbin/ss
+ipa sudocmdgroup-add-member itsupport_cmds --sudocmds="/usr/bin/journalctl"
+ipa sudocmdgroup-add-member itsupport_cmds --sudocmds="/usr/sbin/ss"
+ipa sudorule-add-allow-command itsupport_limited --sudocmdgroups=itsupport_cmds
+ipa sudorule-add-user itsupport_limited --groups=itsupport
+```
+
+Provjera definiranih sudo pravila:
+
+`ipa sudorule-find`
+
+## 4. Napomene za klijentske sustave (SSSD cache)
+
+Na klijentskim sustavima sudo pravila se povlače preko SSSD-a i ne primjenjuju se odmah. Za ubrzano testiranje može se osvježiti cache:
+
+**na klijentu, kao root**
+```bash
+sss_cache -E
+rm -rf /var/lib/sss/db/*
+systemctl restart sssd
+```
+
+opcionalno za brže osvježavanje
+```bash
+echo "sudo_responder_refresh_interval = 1" >> /etc/sssd/sssd.conf
+systemctl restart sssd
+```
