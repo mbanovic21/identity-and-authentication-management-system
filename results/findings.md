@@ -20,11 +20,12 @@ Na temelju ručnih testova iz `implementation/tests/manual-tests.md`:
 
 ## Uočeni problemi i rješenja
 
-Tijekom implementacije i testiranja pojavio se jedan problem:
+Tijekom implementacije i testiranja pojavilo se par problema:
 
 - **Sudo pravila nisu odmah primjenjena na klijentu**  
   Razlog je SSSD cache i odgođeno osvježavanje sudo pravila. Problem je riješen ručnim osvježavanjem cachea na klijentskom sustavu (`sss_cache -E`, brisanje `db` direktorija i restart `sssd` servisa) te, po potrebi, podešavanjem brzine osvježavanja.
-
+- **Pravila nisu vrijedila na svim hostovima**  
+  Kada `hostcat` nije bio ispravno postavljen, pravila se nisu primjenjivala. Korištenje `--hostcat=all` osiguralo je da se pravila vežu na očekivane klijente.
 
 ## Zaključak
 
