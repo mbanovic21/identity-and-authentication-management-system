@@ -185,7 +185,17 @@ Ovo drastično povećava sigurnost te sprječava brute-force napade.
 
 ---
 
-## 7. Uloga FreeIPA u projektu
+## 7. Princip najmanje privilegije
+
+Princip najmanje privilegije (PoLP – Principle of Least Privilege) jedan je od temeljnih sigurnosnih koncepata u administraciji sustava i upravljanju pristupom. Ideja je da svaki korisnik, proces ili servis dobije samo onaj minimalni skup dopuštenja koji mu je nužan za obavljanje zadataka – ni više, ni manje. Time se smanjuje površina napada, posljedice pogrešaka i rizik zloupotrebe ovlasti.
+
+U praksi to znači da se izbjegava rad kao root ili s punim administratorskim pravima kad god to nije apsolutno potrebno. Umjesto toga, korisnici se raspoređuju u uloge i grupe (npr. sysadmin, developer, web administrator, IT podrška), a svaka uloga dobiva ograničen, jasno definiran skup privilegija. Ako se kompromitira račun s ograničenim pravima, napadač može napraviti znatno manje štete nego da odmah preuzme puni root pristup.
+
+U Linux okruženju tipičan alat za provedbu PoLP-a je sudo, kojim se precizno kontrolira koje naredbe određeni korisnici ili grupe smiju pokretati s povišenim privilegijama. Centralizirani IAM sustavi poput FreeIPA dodatno omogućuju da se ta pravila definiraju i primjenjuju centralno nad više poslužitelja, umjesto ručnog uređivanja lokalnih sudoers datoteka na svakom hostu.
+
+---
+
+## 8. Uloga FreeIPA u projektu
 
 U okviru ovog projekta FreeIPA djeluje kao **jezgra sustava**.  
 
@@ -207,7 +217,7 @@ FreeIPA sada omogućuje:
 
 ---
 
-## 8. Zaključak
+## 9. Zaključak
 
 Teorijska podloga koja čini ovaj projekt usko je vezana uz IAM sustave i njihove temeljne tehnologije.  
 LDAP osigurava skladištenje i organizaciju identiteta, Kerberos osigurava siguran model autentifikacije, a FreeIPA spaja ova dva mehanizma u jedinstvenu platformu s dodatnim funkcijama poput DNS-a, certifikata i politika lozinki.
