@@ -83,41 +83,41 @@ Cilj ovog dijela projekta je dizajnirati i implementirati model upravljanja kori
 
 Odabrane su sljedeće uloge i pripadajuće FreeIPA grupe:
 
-- **System Administrators ('sysadmins')**  
+- **System Administrators (`sysadmins`)**  
   Imaju puni administrativni pristup nad sustavom. Potrebne su im sve sudo privilegije radi održavanja, upravljanja servisima i rješavanja incidenata.
 
-- **Developers ('developers')**  
+- **Developers (`developers`)**  
   Programeri koriste sustav za razvoj i testiranje, ali im nije potreban root pristup. Iz tog razloga nemaju dodijeljena sudo pravila.
 
-- **Web Server Administrators ('webadmins')**  
+- **Web Server Administrators (`webadmins`)**  
   Administratori web poslužitelja trebaju upravljati web servisima (npr. nginx, systemctl za web service), ali ne i ostatkom sustava. Za njih se definira ograničen skup sudo naredbi.
 
-- **IT Support ('itsupport')**  
+- **IT Support (`itsupport`)**  
   IT podrška radi dijagnostiku i nadzor sustava (journalctl, ss, itd.), ali ne smije mijenjati konfiguraciju ili pokretati privilegirane operacije izvan nadzora.
 
 ## Primjena PoLP-a kroz sudo pravila
 
 Na temelju gore navedenih uloga definirana su tri glavna sudo pravila:
 
-- **'sysadmin_all'**  
+- **`sysadmin_all`**  
   - Dozvoljava izvršavanje svih naredbi na svim hostovima.  
-  - Primjenjuje se na grupu 'sysadmins'.  
+  - Primjenjuje se na grupu `sysadmins`.  
   - Opravdanje: administratori sustava trebaju punu kontrolu radi održavanja i upravljanja incidentima.
 
-- **'webadmin_http'**  
-  - Dozvoljava samo ograničeni skup naredbi vezanih uz web server (npr. 'systemctl' za web servise, 'nginx').  
-  - Primjenjuje se na grupu 'webadmins'.  
+- **`webadmin_http`**  
+  - Dozvoljava samo ograničeni skup naredbi vezanih uz web server (npr. `systemctl` za web servise, `nginx`).  
+  - Primjenjuje se na grupu `webadmins`.  
   - Opravdanje: web admini mogu upravljati web slojem bez nepotrebnog pristupa ostatku sustava.
 
-- **'itsupport_limited'**  
-  - Dozvoljava samo dijagnostičke naredbe (npr. 'journalctl', 'ss').  
-  - Primjenjuje se na grupu 'itsupport'.  
+- **`itsupport_limited`**  
+  - Dozvoljava samo dijagnostičke naredbe (npr. `journalctl`, `ss`).  
+  - Primjenjuje se na grupu `itsupport`.  
   - Opravdanje: IT podrška može prikupljati informacije i analizirati probleme, ali ne može mijenjati konfiguraciju ni preuzeti puni root pristup.
 
 ## Očekivana ponašanja
 
-- Članovi 'sysadmins' mogu izvršavati bilo koju sudo naredbu.  
-- Članovi 'webadmins' mogu koristiti sudo samo za naredbe vezane uz web; ostale se odbijaju.  
-- Članovi 'itsupport' mogu koristiti sudo samo za monitoring/dijagnostiku; ostale naredbe se odbijaju.  
-- Članovi 'developers' nemaju sudo pristup.
+- Članovi `sysadmins` mogu izvršavati bilo koju sudo naredbu.  
+- Članovi `webadmins` mogu koristiti sudo samo za naredbe vezane uz web; ostale se odbijaju.  
+- Članovi `itsupport` mogu koristiti sudo samo za monitoring/dijagnostiku; ostale naredbe se odbijaju.  
+- Članovi `developers` nemaju sudo pristup.
 
