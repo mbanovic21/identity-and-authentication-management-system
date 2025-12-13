@@ -1,0 +1,14 @@
+pro 04 12:35:28 ipa1.iam.lab systemd[1]: Starting Identity, Policy, Audit...
+pro 04 12:35:31 ipa1.iam.lab ipactl[16192]: Existing service file detected!
+pro 04 12:35:31 ipa1.iam.lab ipactl[16192]: Assuming stale, cleaning and proceeding
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: ipa: INFO: The ipactl command was successful
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting Directory Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting krb5kdc Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting kadmin Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting named Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting httpd Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting ipa-custodia Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting pki-tomcatd Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting ipa-otpd Service
+pro 04 12:36:04 ipa1.iam.lab ipactl[16192]: Starting ipa-dnskeysyncd Service
+pro 04 12:36:04 ipa1.iam.lab systemd[1]: Finished Identity, Policy, Audit.

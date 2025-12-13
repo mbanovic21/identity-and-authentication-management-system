@@ -1,0 +1,17 @@
+[libdefaults]
+  default_realm = IAM.LAB
+  dns_lookup_realm = true
+  dns_lookup_kdc = true
+  rdns = false
+  ticket_lifetime = 24h
+  forwardable = true
+
+[realms]
+  IAM.LAB = {
+    kdc = ipa1.iam.lab
+    admin_server = ipa1.iam.lab
+  }
+
+[domain_realm]
+  .iam.lab = IAM.LAB
+  iam.lab = IAM.LAB

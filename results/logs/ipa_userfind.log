@@ -1,0 +1,27 @@
+---------------
+2 users matched
+---------------
+  User login: admin
+  Last name: Administrator
+  Home directory: /home/admin
+  Login shell: /bin/bash
+  Principal name: admin@IAM.LAB
+  Principal alias: admin@IAM.LAB, root@IAM.LAB
+  UID: 1129000000
+  GID: 1129000000
+  Account disabled: False
+
+  User login: testuser
+  First name: Test
+  Last name: User
+  Home directory: /home/testuser
+  Login shell: /bin/sh
+  Principal name: testuser@IAM.LAB
+  Principal alias: testuser@IAM.LAB
+  Email address: testuser@iam.lab
+  UID: 1129000003
+  GID: 1129000003
+  Account disabled: False
+----------------------------
+Number of entries returned 2
+----------------------------

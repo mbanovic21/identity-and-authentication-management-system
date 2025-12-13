@@ -1,0 +1,5 @@
+Ticket cache: KCM:1000
+Default principal: admin@IAM.LAB
+
+Valid starting       Expires              Service principal
+04.12.2025 16:02:15  05.12.2025 15:29:37  krbtgt/IAM.LAB@IAM.LAB
