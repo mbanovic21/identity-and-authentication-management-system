@@ -1,4 +1,4 @@
-# Implementation plan
+# Plan implementacije
 
 ## 1. Pregled projekta
 
@@ -44,7 +44,7 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
 | ---------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------ |
 | **1. Istraživanje i analiza**            | Proučiti IAM koncepte, protokole (LDAP, Kerberos) i open-source alate.   | Online dokumentacija, OWASP, RFC standardi | Definiran teorijski okvir i arhitektura sustava. |
 | **2. Dizajn sustava**                    | Izrada arhitekture i definiranje odnosa korisnika, grupa i servisa.      | Draw.io, Lucidchart                        | Dijagram sustava i plan implementacije.          |
-| **3. Implementacija**                    | Instalacija i konfiguracija OpenLDAP-a, FreeIPA-e i SSSD-a.              | Linux (Ubuntu/CentOS), CLI                 | Funkcionalan IAM sustav.                         |
+| **3. Implementacija**                    | Instalacija i konfiguracija OpenLDAP-a, FreeIPA-e i SSSD-a.              | Linux (Rocky Linux 9), CLI                 | Funkcionalan IAM sustav.                         |
 | **4. Konfiguracija sigurnosnih pravila** | Postavljanje password policy-a, 2FA autentifikacije i korisničkih prava. | FreeIPA, FreeOTP                           | Uspješno implementirana sigurnosna pravila.      |
 | **5. Testiranje**                        | Testiranje autentifikacije, provjera 2FA, pokušaji brute-force napada.   | Hydra, custom skripte                      | Analiza otpornosti sustava.                      |
 | **6. Evaluacija**                        | Procjena stabilnosti i sigurnosti sustava, izrada zaključaka.            | Dokumentacija                              | Završni izvještaj s prijedlozima poboljšanja.    |
@@ -72,3 +72,52 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
 
 Projekt omogućuje razumijevanje i praktičnu primjenu koncepata iz područja **sigurnosti informacijskih sustava**.
 Korištenjem otvorenih tehnologija studenti mogu naučiti kako se gradi i štiti infrastruktura za upravljanje identitetima, što je ključno u svakoj modernoj organizaciji.
+
+# Plan upravljanja korisnicima i pristupom (PoLP)
+
+## Cilj
+
+Cilj ovog dijela projekta je dizajnirati i implementirati model upravljanja korisnicima i pristupom u FreeIPA sustavu koji slijedi princip najmanje privilegije (PoLP). Fokus je na centralnom upravljanju identitetima, grupama i sudo pravilima za administraciju klijentskih sustava.
+
+## Uloge i grupe
+
+Odabrane su sljedeće uloge i pripadajuće FreeIPA grupe:
+
+- **System Administrators ('sysadmins')**  
+  Imaju puni administrativni pristup nad sustavom. Potrebne su im sve sudo privilegije radi održavanja, upravljanja servisima i rješavanja incidenata.
+
+- **Developers ('developers')**  
+  Programeri koriste sustav za razvoj i testiranje, ali im nije potreban root pristup. Iz tog razloga nemaju dodijeljena sudo pravila.
+
+- **Web Server Administrators ('webadmins')**  
+  Administratori web poslužitelja trebaju upravljati web servisima (npr. nginx, systemctl za web service), ali ne i ostatkom sustava. Za njih se definira ograničen skup sudo naredbi.
+
+- **IT Support ('itsupport')**  
+  IT podrška radi dijagnostiku i nadzor sustava (journalctl, ss, itd.), ali ne smije mijenjati konfiguraciju ili pokretati privilegirane operacije izvan nadzora.
+
+## Primjena PoLP-a kroz sudo pravila
+
+Na temelju gore navedenih uloga definirana su tri glavna sudo pravila:
+
+- **'sysadmin_all'**  
+  - Dozvoljava izvršavanje svih naredbi na svim hostovima.  
+  - Primjenjuje se na grupu 'sysadmins'.  
+  - Opravdanje: administratori sustava trebaju punu kontrolu radi održavanja i upravljanja incidentima.
+
+- **'webadmin_http'**  
+  - Dozvoljava samo ograničeni skup naredbi vezanih uz web server (npr. 'systemctl' za web servise, 'nginx').  
+  - Primjenjuje se na grupu 'webadmins'.  
+  - Opravdanje: web admini mogu upravljati web slojem bez nepotrebnog pristupa ostatku sustava.
+
+- **'itsupport_limited'**  
+  - Dozvoljava samo dijagnostičke naredbe (npr. 'journalctl', 'ss').  
+  - Primjenjuje se na grupu 'itsupport'.  
+  - Opravdanje: IT podrška može prikupljati informacije i analizirati probleme, ali ne može mijenjati konfiguraciju ni preuzeti puni root pristup.
+
+## Očekivana ponašanja
+
+- Članovi 'sysadmins' mogu izvršavati bilo koju sudo naredbu.  
+- Članovi 'webadmins' mogu koristiti sudo samo za naredbe vezane uz web; ostale se odbijaju.  
+- Članovi 'itsupport' mogu koristiti sudo samo za monitoring/dijagnostiku; ostale naredbe se odbijaju.  
+- Članovi 'developers' nemaju sudo pristup.
+
