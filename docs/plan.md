@@ -57,7 +57,7 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
 | **FreeIPA**                        | Centralizirano rješenje za upravljanje identitetima i autentifikacijom. | Integrira LDAP, Kerberos i certifikate u jedno rješenje. Omogućava jednostavno dodavanje 2FA i policy-ja. |
 | **SSSD**                           | Omogućava autentifikaciju Linux korisnika prema centralnom direktoriju. | Potrebna komponenta za integraciju sustava s OS-om i servisima.                                           |
 | **FreeOTP / Google Authenticator** | Implementacija dvofaktorske autentifikacije.                            | Jednostavni, open-source i sigurni alati za 2FA.                                                          |
-| **Linux (Ubuntu / Fedora)**        | Operativni sustav za implementaciju i testiranje.                       | Otvorena platforma s podrškom za sve potrebne alate i servise.                                            |
+| **Linux (Rocky Linux 9)**        | Operativni sustav za implementaciju i testiranje.                       | Otvorena platforma s podrškom za sve potrebne alate i servise.                                            |
 | **Hydra / testne skripte**         | Testiranje otpornosti na brute-force napade.                            | Omogućuju realno testiranje sigurnosnih mehanizama.                                                       |
 
 ## 6. Očekivani rezultati
