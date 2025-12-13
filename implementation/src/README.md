@@ -1,4 +1,4 @@
-## 🔥 Instalacija i pokretanje FreeIPA servera
+## Instalacija i pokretanje FreeIPA servera
 
 ### 1. Na **server VM** (Rocky Linux 9)
 
@@ -16,11 +16,11 @@ klist
 ipa user-find
 ```
 
-Ako vidiš ticket u `klist` → Kerberos radi 👍
+Ako vidiš ticket u `klist` → Kerberos radi
 
 ---
 
-## 🔗 Spajanje klijenta na FreeIPA
+## Spajanje klijenta na FreeIPA
 
 ### 2. Na **client VM**:
 
@@ -40,7 +40,7 @@ su - testuser      # ako je kreiran na serveru
 
 ---
 
-## 🧪 Testiranje sustava
+## Testiranje sustava
 
 ```bash
 cd implementation/tests
