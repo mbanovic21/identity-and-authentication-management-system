@@ -33,6 +33,10 @@ Očekivani ishodi:
 - `sudo whoami` vraća `root`.
 - `sudo cat /etc/shadow` se izvršava bez greške.
 
+![polp-sysadmin-ivana-id-whoami-allowed](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-sysadmin-ivana-id-whoami-allowed.jpg)
+
+![polp-sysadmin-ivana-shadow-allowed](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-sysadmin-ivana-shadow-allowed.jpg)
+
 ## Test 2: Pero (Developer) – bez sudo pristupa
 
 **Korisnik:** `pero`  
@@ -52,6 +56,8 @@ exit
 Očekivani ishodi:
 
 - Pokušaj `sudo id` završava porukom da korisnik ne smije pokretati sudo na tom hostu.
+
+![polp-developer-pero-sudo-denied](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-developer-pero-sudo-denied.jpg)
 
 ## Test 3: David (IT Support) – ograničen na dijagnostiku
 
@@ -75,6 +81,12 @@ Očekivani ishodi:
 
 - `sudo journalctl -n 5` i `sudo ss -tuln` se izvršavaju uspješno.
 - `sudo cat /etc/shadow` je odbijen uz poruku da korisnik nema dopuštenje.
+
+![polp-itsupport-david-journalctl-allowed](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-itsupport-david-journalctl-allowed.jpg)
+
+![polp-itsupport-david-ss-allowed](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-itsupport-david-ss-allowed.jpg)
+
+![polp-itsupport-david-shadow-denied](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-itsupport-david-shadow-denied.jpg)
 
 ## Test 4: Ana (Web Administrator) – ograničene web naredbe
 
@@ -100,6 +112,11 @@ Očekivani ishodi:
 - `sudo systemctl status nginx` i `sudo systemctl restart httpd` rade.
 - `sudo journalctl -n 5` i `sudo whoami` su odbijeni.
 
+![polp-webadmin-ana-httpd-allowed](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-webadmin-ana-httpd-allowed.jpg)
+
+![polp-webadmin-ana-nginx-allowed](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-webadmin-ana-nginx-allowed.jpg)
+
+![polp-webadmin-ana-journal-whomai-denied](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/polp-webadmin-ana-journal-whoami-denied.jpg)
 
 Cilj ovih testova je potvrditi da:
 
