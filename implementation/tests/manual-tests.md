@@ -1,6 +1,6 @@
-# Ručni testovi: korisnici, grupe i sudo pravila
+# 1. Korisnici, grupe i sudo pravila
 
-Ovaj dokument opisuje ručne testove za provjeru da FreeIPA korisnici, grupe i sudo pravila implementiraju princip najmanje privilegije (PoLP).
+Ovaj dio dokumenta opisuje ručne testove za provjeru da FreeIPA korisnici, grupe i sudo pravila implementiraju princip najmanje privilegije (PoLP).
 
 ## Priprema
 
@@ -107,3 +107,33 @@ Cilj ovih testova je potvrditi da:
 - webadmini imaju minimalne potrebne privilegije za web,
 - IT support ima samo dijagnostiku,
 - developeri nemaju sudo.
+
+# 2. Brute-force napad i zaključavanje računa
+
+## Cilj
+Potvrditi da password policy (Max failures, Failure reset interval, Lockout duration) ispravno zaključava račun nakon previše pogrešnih lozinki.
+
+## Preduvjeti
+- FreeIPA server s globalnom password policy:
+  - Max failures: 5
+  - Failure reset interval: 300 s
+  - Lockout duration: 600 s
+- Klijentski sustav postavljen u FreeIPA (SSSD radi).
+- Test korisnik: ivana.
+
+## Koraci
+**1. Na klijentskom sustavu:**
+```bash
+ssh ivana@ipa1.iam.lab
+```
+- Potrebno je 5 puta unijeti namjerno pogrešnu lozinku
+
+**2. Šesti pokušaj s točnom lozinkom:**
+- Očekivano: login ne uspijeva, poruka o zaključanom računu.
+
+**3. Nakon 600 s ili nakon `ipa user-unlock ivana` na serveru:**
+- Ponovni login s točnom lozinkom uspijeva.
+
+## Očekivani rezultat
+- Nakon Max failures pokušaja, račun je zaključan za vrijeme definirano u Lockout duration.
+- FreeIPA time-based lockout mehanizam radi i time mitigira brute-force napade.
