@@ -131,9 +131,14 @@ ssh ivana@ipa1.iam.lab
 **2. Šesti pokušaj s točnom lozinkom:**
 - Očekivano: login ne uspijeva, poruka o zaključanom računu.
 
+![brute-force-client](https://github.com/user-attachments/assets/78f2de97-9d51-458d-9d9a-5631e0fbf3f7)
+
 **3. Nakon 600 s ili nakon `ipa user-unlock ivana` na serveru:**
 - Ponovni login s točnom lozinkom uspijeva.
 
 ## Očekivani rezultat
 - Nakon Max failures pokušaja, račun je zaključan za vrijeme definirano u Lockout duration.
 - FreeIPA time-based lockout mehanizam radi i time mitigira brute-force napade.
+
+![brute-force-server](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/brute-force-server.png)
+
