@@ -110,12 +110,12 @@ Integrira više servisa u jednu platformu:
 
 To znači da FreeIPA u jednom sustavu objedinjuje:
 
-✔ autentifikaciju  
-✔ autorizaciju  
-✔ identitete  
-✔ password policy  
-✔ certifikate  
-✔ DNS zone  
+* autentifikaciju  
+* autorizaciju  
+*  identitete  
+* password policy  
+* certifikate  
+* DNS zone  
 
 ---
 
@@ -249,7 +249,45 @@ Pridruživanje klijenta domeni vrši se putem alata ipa-client-install. Ovaj pro
 
 ---
 
-## 9. Zaključak
+## 10. Dvofaktorska autentifikacija (2FA) u FreeIPA sustavu
+
+S obzirom na to da klasična autentifikacija temeljena isključivo na lozinci predstavlja značajan sigurnosni rizik, moderni IAM sustavi sve češće implementiraju dvofaktorsku ili višefaktorsku autentifikaciju (2FA/MFA). Dvofaktorska autentifikacija kombinira nešto što korisnik zna (npr. lozinku) i nešto što korisnik ima (npr. mobilni uređaj ili sigurnosni token), čime se značajno smanjuje mogućnost neovlaštenog pristupa čak i u slučaju kompromitacije lozinke.
+
+FreeIPA nativno podržava 2FA mehanizme temeljene na jednokratnim zaporkama (OTP – One-Time Password), koji se integriraju s postojećim Kerberos i PAM autentifikacijskim tijekom bez potrebe za dodatnim vanjskim servisima.
+
+### 10.1 TOTP – Time-based One-Time Password
+
+U ovom projektu implementiran je TOTP (Time-based One-Time Password) mehanizam, koji generira jednokratne zaporke temeljene na zajedničkom tajnom ključu i trenutnom vremenu. TOTP kodovi imaju ograničeno vrijeme valjanosti (najčešće 30 sekundi), čime se onemogućuje njihova ponovna upotreba i smanjuje rizik od presretanja.
+
+FreeIPA koristi vlastiti OTP servis (ipa-otpd), koji tijekom autentifikacije surađuje s Kerberosom i PAM modulima. Kada korisnik pokušava izvršiti prijavu, sustav provodi sljedeći postupak:
+
+* provjerava korisničko ime i lozinku,
+
+* validira TOTP kod putem OTP servisa,
+
+* tek nakon uspješne provjere oba faktora izdaje Kerberos ticket.
+
+Time se osigurava da je autentifikacija uspješna isključivo ako su oba faktora valjana.
+
+### 10.2 Integracija s aplikacijom Google Authenticator
+
+Kao klijentska aplikacija za generiranje TOTP kodova korišten je Google Authenticator, koji je široko prihvaćen, jednostavan za korištenje i dostupan na svim relevantnim mobilnim platformama. Tijekom inicijalne konfiguracije korisniku se dodjeljuje jedinstveni tajni ključ, koji se pohranjuje u FreeIPA sustavu, a korisnik ga skenira putem QR koda u aplikaciji.
+
+Nakon inicijalnog povezivanja, Google Authenticator periodično generira TOTP kodove koji se koriste kao drugi faktor autentifikacije. Ovakav pristup ne zahtijeva stalnu mrežnu povezanost mobilnog uređaja, čime se dodatno povećava pouzdanost i praktičnost rješenja.
+
+### 10.3 Uloga SSSD-a i PAM-a u 2FA procesu
+
+Na klijentskoj strani, SSSD ima ključnu ulogu u provedbi dvofaktorske autentifikacije. Tijekom prijave korisnika, SSSD kroz PAM stack koordinira komunikaciju između lokalnog sustava, Kerberosa i FreeIPA OTP servisa. Korisniku se prezentira objedinjeni autentifikacijski zahtjev, pri čemu unosi lozinku i jednokratni TOTP kod.
+
+Važno je naglasiti da sustav, iz sigurnosnih razloga, ne razlikuje vrste pogrešaka tijekom autentifikacije. Bez obzira na to je li problem u lozinci, TOTP kodu, politici autentifikacije ili stanju servisa, korisniku se prikazuje generička poruka o neuspješnoj autentifikaciji. Takav pristup sprječava potencijalne napadače u prikupljanju informacija o unutarnjem stanju sustava.
+
+### 10.4 Sigurnosne prednosti 2FA u IAM sustavima
+
+Implementacijom dvofaktorske autentifikacije u FreeIPA sustavu postiže se znatno viša razina sigurnosti u odnosu na klasične mehanizme temeljene isključivo na lozinkama. Čak i u slučaju krađe korisničkih vjerodajnica, napadač bez pristupa drugom faktoru ne može uspješno izvršiti prijavu.
+
+U kontekstu ovog projekta, 2FA predstavlja važan dodatni sloj zaštite koji se prirodno nadovezuje na postojeće sigurnosne mehanizme poput password policy-ja, Kerberos autentifikacije i principa najmanje privilegije. Time FreeIPA sustav ne služi samo kao centralni identitetski servis, već i kao snažna sigurnosna platforma prilagođena suvremenim prijetnjama.
+
+## 11. Zaključak
 
 Teorijska podloga koja čini ovaj projekt usko je vezana uz IAM sustave i njihove temeljne tehnologije.  
 LDAP osigurava skladištenje i organizaciju identiteta, Kerberos osigurava siguran model autentifikacije, a FreeIPA spaja ova dva mehanizma u jedinstvenu platformu s dodatnim funkcijama poput DNS-a, certifikata i politika lozinki.
