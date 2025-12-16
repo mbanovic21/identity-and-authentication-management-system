@@ -60,18 +60,6 @@ Projekt se sastoji od **teorijskog** i **praktičnog** dijela.
 | **Linux (Rocky Linux 9)**        | Operativni sustav za implementaciju i testiranje.                       | Otvorena platforma s podrškom za sve potrebne alate i servise.                                            |
 | **Hydra / testne skripte**         | Testiranje otpornosti na brute-force napade.                            | Omogućuju realno testiranje sigurnosnih mehanizama.                                                       |
 
-## 6. Očekivani rezultati
-
-* Funkcionalan IAM sustav koji omogućava sigurno upravljanje korisnicima i autentifikacijom.
-* Uvedena dvofaktorska autentifikacija i politika lozinki.
-* Dokumentirana arhitektura i koraci implementacije.
-* Rezultati testiranja sigurnosti i analiza ranjivosti.
-* Prijedlozi za unaprjeđenje i mogućnosti daljnjeg razvoja (npr. integracija s Active Directoryjem ili cloud servisima).
-
-## 7. Zaključak
-
-Projekt omogućuje razumijevanje i praktičnu primjenu koncepata iz područja **sigurnosti informacijskih sustava**.
-Korištenjem otvorenih tehnologija studenti mogu naučiti kako se gradi i štiti infrastruktura za upravljanje identitetima, što je ključno u svakoj modernoj organizaciji.
 
 # Plan upravljanja korisnicima i pristupom (PoLP)
 
@@ -120,4 +108,17 @@ Na temelju gore navedenih uloga definirana su tri glavna sudo pravila:
 - Članovi `webadmins` mogu koristiti sudo samo za naredbe vezane uz web; ostale se odbijaju.  
 - Članovi `itsupport` mogu koristiti sudo samo za monitoring/dijagnostiku; ostale naredbe se odbijaju.  
 - Članovi `developers` nemaju sudo pristup.
+
+## 6. Očekivani rezultati
+
+* Funkcionalan IAM sustav koji omogućava sigurno upravljanje korisnicima i autentifikacijom.
+* Uvedena dvofaktorska autentifikacija i politika lozinki.
+* Dokumentirana arhitektura i koraci implementacije.
+* Rezultati testiranja sigurnosti i analiza ranjivosti.
+* Prijedlozi za unaprjeđenje i mogućnosti daljnjeg razvoja (npr. integracija s Active Directoryjem ili cloud servisima).
+
+## 7. Zaključak
+
+Projekt omogućuje razumijevanje i praktičnu primjenu koncepata iz područja **sigurnosti informacijskih sustava**.
+Korištenjem otvorenih tehnologija studenti mogu naučiti kako se gradi i štiti infrastruktura za upravljanje identitetima, što je ključno u svakoj modernoj organizaciji.
 
