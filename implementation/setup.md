@@ -555,9 +555,12 @@ systemctl restart sssd
 ```
 
 # 4. 2FA i provjera prijave korisnika u sustav
-**Autor: ** Anamarija Dominiković
-**Uloga: ** Član 4 – Inženjer za 2FA i sigurnosnu autentifikaciju
-**Tehnologije: ** VirtualBox, Rocky Linux 9, FreeIPA, Kerberos, SSSD
+**Autor:** Anamarija Dominiković
+
+**Uloga:** Član 4 – Inženjer za 2FA i sigurnosnu autentifikaciju
+
+**Tehnologije:** VirtualBox, Rocky Linux 9, FreeIPA, Kerberos, SSSD
+
 Ovaj dio opisuje implementaciju **dvofaktorske autentikacije (2FA)** korištenjem **TOTP tokena** u FreeIPA sustavu te provjeru autentikacije korisnika.
 2FA je integrirana u Kerberos autentikacijski mehanizam i **selektivno se primjenjuje po korisnicima**, ovisno o sigurnosnim pravilima.
 ________________________________________
@@ -568,9 +571,12 @@ kinit admin
 klist
 ```
 (_unesite lozinku za admin korisnika_)
+
 **Očekivani ishod:**
 Default principal: admin@IAM.LAB
+
 Potvrđena administrativna autentifikacija
+
 Omogućeno izvođenje FreeIPA administrativnih naredbi
 ________________________________________
 ## 1. Provjera korisnika i omogućavanje 2FA (server)
@@ -581,4 +587,166 @@ ipa user-show ana
 **Svrha:**
 Provjerava postojeće postavke autentikacije korisnika (uključujući User authentication types).
 ________________________________________
+### 1.2 Omogućavanje OTP autentikacije za korisnicu ana
+```bash
+ipa user-mod ana --user-auth-type=otp
+```
+**Svrha:**
+Korisnici se postavlja autentikacijski tip OTP, čime se zahtijeva lozinka + TOTP kod.
+
+**Očekivani ishod:**
+U ipa user-show ana prikazuje se:
+```bash
+User authentication types: otp
+```
+________________________________________
+## 2. Kreiranje TOTP tokena (server)
+### 2.1 Primarni TOTP token za ana
+```bash
+ipa otptoken-add --type=totp --owner=ana --description="TOTP token za korisnika ana"
+```
+
+**Svrha:**
+Generira se TOTP tajni ključ i QR kod.
+**Očekivani ishod:**
+URI za TOTP i	ASCII QR kod
+QR kod se skenira u Google Authenticator aplikaciji i aplikacija generira 6-znamenkasti kod
+________________________________________
+### 2.2 Pregled tokena korisnice ana
+```bash
+ipa otptoken-find --owner=ana
+```
+
+**Očekivani ishod:**
+```bash
+Unique ID: <TOKEN_ID>
+```
+Unique ID se koristi za administraciju i brisanje tokena.
+________________________________________
+### 2.3 Backup (recovery) TOTP token za ana
+```bash
+ipa otptoken-add --type=totp --owner=ana --description="Backup TOTP token za korisnika ana"
+```
+Naredba služi za oporavak pristupa u slučaju gubitka primarnog uređaja
+________________________________________
+
+## 3. Primjena 2FA na dodatne korisnike (server)
+### 3.1 Omogućavanje OTP za korisnicu ivana
+```bash
+ipa user-mod ivana --user-auth-type=otp
+```
+### 3.2 Kreiranje TOTP tokena za ivana
+```bash
+ipa otptoken-add --type=totp --owner=ivana --description="TOTP za ivanu"
+```
+### 3.3 Kreiranje backup tokena za ivana
+```
+ipa otptoken-add --type=totp --owner=ivana --description="Backup token za korisnika ivana"
+```
+________________________________________
+### 3.4 Omogućavanje OTP za administratoricu marta
+```bash
+ipa user-mod marta --user-auth-type=otp
+```
+### 3.5 Kreiranje TOTP tokena za marta
+```bash
+ipa otptoken-add --type=totp --owner=marta --description="TOTP za martu"
+```
+### 3.6 Kreiranje backup tokena za marta
+```bash
+ipa otptoken-add --type=totp --owner=marta --description="Backup TOTP token za martu"
+```
+2FA je primijenjena selektivno – po korisnicima i ulogama
+________________________________________
+## 4. Provjera prijave korisnika (klijent)
+### 4.1 Prijava korisnice ivana
+```bash
+su - ivana
+```
+ili
+```
+kinit ivana
+```
+Redoslijed unosa:
+1.	Lozinka
+2.	TOTP kod
+________________________________________
+### 4.2 Prijava korisnice marta
+```bash
+su - marta
+```
+ili
+```bash
+kinit marta
+```
+________________________________________
+### 4.3 Provjera Kerberos ticketa
+```bash
+klist
+```
+**Očekivani ishod:**
+```bash
+Default principal: ivana@IAM.LAB
+```
+ili
+```bash
+Default principal: marta@IAM.LAB
+```
+Potvrđena uspješna 2FA autentikacija
+________________________________________
+## 5. Aktivacija OTP servisa (server)
+```bash
+sudo systemctl enable --now ipa-otpd.socket
+systemctl status ipa-otpd.socket
+```
+**Očekivani ishod:**
+
+```bash
+active (listening)
+```
+OTP daemon sluša zahtjeve za TOTP autentikaciju
+________________________________________
+## 6. Recovery postupci (incident response)
+### 6.1 Administratorska autentifikacija
+```bash
+kinit admin
+klist
+```
+________________________________________
+### 6.2 Identifikacija tokena kompromitirane korisnice (marta)
+```bash
+ipa otptoken-find --owner=marta
+```
+________________________________________
+### 6.3 Brisanje TOTP tokena po ID-u
+```bash
+ipa otptoken-del <TOKEN_ID>
+```
+Uklanja kompromitirani TOTP token
+________________________________________
+### 6.4 Otključavanje korisničkog računa
+(u slučaju premašivanja broja neuspjelih pokušaja)
+```bash
+ipa user-unlock marta
+```
+________________________________________
+### 7. Provjera sigurnosnih logova
+```bash
+journalctl -u krb5kdc | tail -n 50
+```
+Svrha:
+Analiza pokušaja prijave, grešaka i 2FA događaja u Kerberos KDC-u.
+________________________________________
+### 8. Sažetak
+Implementirana 2FA autentikacija (TOTP)
+
+Selektivna primjena po korisnicima
+
+Backup tokeni za recovery
+
+Testirana prijava korisnika
+
+Definiran recovery plan
+
+Centralizirani audit kroz Kerberos logove
 
