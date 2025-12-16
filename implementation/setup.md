@@ -553,6 +553,145 @@ opcionalno za brže osvježavanje
 echo "sudo_responder_refresh_interval = 1" >> /etc/sssd/sssd.conf
 systemctl restart sssd
 ```
+---
+
+# 3. Integracija klijentskog sustava i testiranje autentifikacije (SSSD)
+**Autor:** _Katarina Uremović_  
+**Uloga:** Član 3 – Inženjer za klijent integraciju i SSSD  
+**Tehnologije:** VirtualBox, Rocky Linux 9, FreeIPA Client, SSSD, Kerberos
+
+
+Ovaj dio projekta opisuje postupak pripreme i kofiguracije klijentskog Linux sustava te njegovo povezivanje u postojeći FreeIPA IAM sustav. Fokus je na pravilnoj mrežnoj i DNS konfiguraciji, instalaciji FreeIPA klijenta, integraciji sa SSSD-om te testiranje autentifikacije, autorizacije i sigurnosnih politika s klijentske strane. 
+Pretpostavlja se da je FreeIPA poslužitelj već instaliran i konfigurrian (dijelovi člana 1 i člana 2).
+
+---
+
+## 1. Priprema klijentske virtualne mašine
+
+### 1.1. Kreiranje VM-a u VirtualBoxu
+1. **New → Name and operating system**
+   - Name: `RockyLinux9 - Client `
+   - Type: `Linux`
+   - Version: `Red Hat (64-bit)` 
+
+2. **Memory size**
+   - 4096 MB (preporučeno 2-4 GB)  
+   
+3. **Hard disk**
+   - Create a virtual hard disk now → VDI → Dynamically allocated → 40 GB 
+
+4. **Network**
+   - Adapter 1: `Host-only Adapter` (ista mreža kao FreeIPA server).
+   - Adapter 2 (opcionalno): `NAT` (za pristup internetu iz VM-a).
+
+Na ovaj način osigurana je mrežna povezanost izmeđi klijenta i FreeIPA server
+
+### 1.2. Instalacija Rocky Linux 9
+
+1. Preuzeti `Rocky Linux 9` ISO (npr. DVD ili Minimal).
+2. U VirtualBoxu u `Settings → Storage` mountati ISO na optički pogon VM-a.
+3. Pokrenuti VM i slijediti installer:
+   - Jezik: npr. English (United States) ili Hrvatski.
+   - Installation Destination: automatsko particioniranje je dovoljno.
+4. Po završetku instalacije, reboot.
+---
+## 2. Osnovna konfiguracija klijentskog sustava
+
+### 2.1. Postavljanje hostname-a
+
+Na klijentu je postavljen potpuno kvalificirani naziv računala (FQDN):
+
+```bash
+sudo hostnamectl set-hostname slient1.iam.lab
+```
+
+Provjera:
+
+```bash
+hostname
+hostname -f
+```
+
+Očekivano:
+* `client1`
+* `client1.iam.lab`
+
+### 2.2. Provjera mreže i IP adrese
+
+```bash
+ip addr
+```
+
+Provjerava se da klijent ima IP adresu iz iste Host-only mreže kao i FreeIPA poslužitelj.
+
+### 2.3. Postavljanje statičke IP adrese i DNS konfiguracija 
+
+Za stabilan rad unutar FreeIPA domene, klijentski stroj mora imati fiksne mrežne parametre. Dinamičke adrese mogu uzrokovati probleme s Kerberos ticketima i DNS rezolucijom. Konfiguracija je izvršena na Host-only adapteru (enp0s3) prema sljedećim koracima:
+1.**Definiranje statički parametara:** pomoću alata `nmcli` postavljena je IP adresa iz opsega laboratorijske mreže, definiran je gateway te je klijent usmjeren na FreeIPA poslužitelj kao primarni DNS(u sljedećem primjeru IP adresa klijenta je 192.168.56.105, a IP adresa poslužitelja je 192.168.56.104):
+
+```bash
+sudo nmcli connection modify enp0s3 ipv4.addresses 192.168.56.105/24 
+sudo nmcli connection modify enp0s3 ipv4.gateway 192.168.56.1 
+sudo nmcli connection modify enp0s3 ipv4.dns "192.168.56.104" 
+sudo nmcli connection modify enp0s3 ipv4.dns-search "iam.lab" 
+sudo nmcli connection modify enp0s3 ipv4.method manual
+```
+
+2.**Izolacija DNS prometa:** Budući da klijent koristi i **NAT** adapter za pristup internetu, onemogućeno je automatsko preuzimanje DNS postavki s vanjskog routera kako bi se izbjegli konflikti:
+```bash
+sudo nmcli connection modify enp0s8 ipv4.ignore-auto-dns yes
+```
+
+3.**Primjena i verifikacija:** Nakon ponovnog pokretanja sučelja (`nmcli connection up`), ispravnost konfiguracije potvrđena je provjerom `/etc/reslov.conf` :
+* **Naredba:** `cat /etc/reslov.conf`
+* **Očekivani ispis:** `nameserver 192.168.56.104`
+
+Ispravno komunikacija s poslužiteljem provjerena je naredbom: `ping –c 3 ipa1.iam.lab`
+
+### 2.4. Sinkronizacija vremena
+
+Kerberos zahtijeva sinkronizirano sistemsko vrijeme.
+
+```bash
+sudo dnf install -y chrony
+sudo systemctl enable --now chronyd
+chronyc sources
+```
+
+## 3. Instalacija FreeIPA klijenta
+
+Na klijentskom sustavu instalirani su potrebni paketi:
+
+```bash
+sudo dnf install -y ipa-client sssd oddjob oddjob-mkhomedir adcli samba-common-tools
+```
+
+Ovi paketi omogućuju:
+* integraciju u FreeIPA domenu,
+* Kerberos autentifikaciju,
+* automatsko kreiranje home direktorija korisnika.
+
+## 4. Povezivanje klijenta u FreeIPA domenu
+
+Klijent je pridružen FreeIPA domeni pomoću naredbe:
+
+```bash
+sudo ipa-client-install –mkhomedir
+```
+
+Tijekom instalacije korištene su sljedeće vrijednosti:
+* **Server:** `ipa1.iam.lab`
+* **Domain:** `iam.lab`
+* **Realm:** `IAM.LAB`
+* **Enrollment user:** `admin`
+
+Uspješan završetak instalacije potvrđuje da je klijent registriran u FreeIPA sustavu.
+
+Provjera SSSD servisa:
+
+```bash
+systemctl status sssd
+```
 
 # 4. 2FA i provjera prijave korisnika u sustav
 **Autor:** Anamarija Dominiković
