@@ -602,7 +602,7 @@ Na ovaj način osigurana je mrežna povezanost izmeđi klijenta i FreeIPA server
 Na klijentu je postavljen potpuno kvalificirani naziv računala (FQDN):
 
 ```bash
-sudo hostnamectl set-hostname slient1.iam.lab
+sudo hostnamectl set-hostname client1.iam.lab
 ```
 
 Provjera:
