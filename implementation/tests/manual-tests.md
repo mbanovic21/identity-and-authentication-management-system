@@ -159,3 +159,123 @@ ssh ivana@ipa1.iam.lab
 
 ![brute-force-server](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/brute-force-server.png)
 
+# 3. Testiranje autentifikacije putem GUI klijentske aplikacije
+
+Ovo poglavlje opisuje ručne testove provedene pomoću jednostavne GUI klijentske aplikacije razvijene u Pythonu, čija je svrha testiranje autentifikacije korisnika prema FreeIPA sustavu.
+GUI aplikacija služi kao alternativni klijentski ulaz u sustav, uz SSH, te koristi Kerberos mehanizam (kinit) za provjeru korisničkih vjerodajnica.
+
+Cilj ovih testova je potvrditi da se iste autentifikacijske i sigurnosne politike (neispravna lozinka, zaključavanje računa) primjenjuju neovisno o načinu pristupa sustavu (CLI ili GUI).
+
+## Priprema
+
+**Pretpostavke:**
+
+* FreeIPA server je konfiguriran prema dokumentu implementation/setup.md.
+
+* Klijentski sustav je pridružen FreeIPA domeni.
+
+* Kerberos autentifikacija (kinit) radi ispravno na klijentu.
+
+* GUI aplikacija je pokrenuta na klijentskom sustavu.
+
+## Test 1: Uspješna autentifikacija putem GUI-a
+
+**Korisnik:** `ivo`
+
+**Očekivanje:** Autentifikacija s ispravnim vjerodajnicama uspješno prolazi.
+
+### Koraci:
+
+1. Pokrenuti GUI aplikaciju na klijentskom sustavu.
+
+2. U polje za korisničko ime unijeti ivo.
+
+3. U polje za lozinku unijeti ispravnu lozinku.
+
+4. Kliknuti na gumb za prijavu.
+
+### Očekivani ishodi:
+
+GUI aplikacija prikazuje poruku o uspješnoj autentifikaciji.
+
+![ispravni_podaci](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/prijava_ispravni_podaci.png?raw=true)
+
+## Test 2: Neuspješna autentifikacija – pogrešna lozinka
+
+**Korisnik:** `ivo`
+
+**Očekivanje:** Autentifikacija ne prolazi zbog pogrešne lozinke.
+
+### Koraci:
+
+1. Pokrenuti GUI aplikaciju.
+
+2. Unijeti korisničko ime ivo.
+
+3. Unijeti namjerno pogrešnu lozinku.
+
+4. Kliknuti na gumb za prijavu.
+
+### Očekivani ishodi:
+
+GUI aplikacija prikazuje poruku o neuspješnoj autentifikaciji (pogrešna lozinka).
+
+![neispravni_podaci](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/pokusaj_prijave_neto%C4%8Dna_lozinka.png?raw=true)
+
+
+## Test 3: Zaključavanje korisničkog računa putem GUI-a (brute-force simulacija)
+
+**Korisnik:** ivo
+**Očekivanje:** Račun se zaključava nakon maksimalnog broja neuspješnih pokušaja prijave.
+
+### Preduvjeti:
+
+* FreeIPA password policy:
+
+* Max failures: 5
+
+* Failure reset interval: 300 s
+
+* Lockout duration: 600 s
+
+### Koraci:
+
+1. Pokrenuti GUI aplikaciju.
+
+2. Pet puta uzastopno pokušati prijavu s pogrešnom lozinkom.
+
+3. Šesti put pokušati prijavu s ispravnom lozinkom.
+
+### Očekivani ishodi:
+
+* GUI aplikacija prikazuje poruku da je korisnički račun zaključan.
+
+* Autentifikacija ne prolazi unatoč ispravnoj lozinci.
+
+![zakljucan_profil](https://github.com/mbanovic21/identity-and-authentication-management-system/blob/main/results/screenshots/prijava_nakon_zakljucavanja_profila.png?raw=true)
+
+## Test 4: Ponovna autentifikacija nakon isteka lockouta
+
+**Korisnik:** ivo
+**Očekivanje:** Autentifikacija ponovno uspijeva nakon isteka lockout perioda ili ručnog otključavanja računa.
+
+### Koraci:
+
+1. Pričekati isteka vremena definiranog u Lockout duration (600 s)
+ili otključati korisnika na FreeIPA serveru pomoću:
+
+`ipa user-unlock ivana`
+
+
+2. Pokrenuti GUI aplikaciju.
+
+3. Pokušati prijavu s ispravnom lozinkom.
+
+### Očekivani ishodi:
+
+* GUI aplikacija prikazuje poruku o uspješnoj autentifikaciji.
+
+## Zaključak
+
+Provedeni testovi potvrđuju da FreeIPA autentifikacijske i sigurnosne politike (neispravna lozinka, zaključavanje računa) djeluju jednako neovisno o klijentskom sučelju.
+Time je potvrđeno da se mehanizmi zaštite od brute-force napada konzistentno primjenjuju i na razini aplikacijskog klijenta.
