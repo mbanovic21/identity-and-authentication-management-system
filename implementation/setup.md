@@ -553,3 +553,32 @@ opcionalno za brže osvježavanje
 echo "sudo_responder_refresh_interval = 1" >> /etc/sssd/sssd.conf
 systemctl restart sssd
 ```
+
+# 4. 2FA i provjera prijave korisnika u sustav
+**Autor: ** Anamarija Dominiković
+**Uloga: ** Član 4 – Inženjer za 2FA i sigurnosnu autentifikaciju
+**Tehnologije: ** VirtualBox, Rocky Linux 9, FreeIPA, Kerberos, SSSD
+Ovaj dio opisuje implementaciju **dvofaktorske autentikacije (2FA)** korištenjem **TOTP tokena** u FreeIPA sustavu te provjeru autentikacije korisnika.
+2FA je integrirana u Kerberos autentikacijski mehanizam i **selektivno se primjenjuje po korisnicima**, ovisno o sigurnosnim pravilima.
+________________________________________
+## 0. Priprema (server)
+Administrator se autentificira u Kerberos realm:
+```bash
+kinit admin
+klist
+```
+(_unesite lozinku za admin korisnika_)
+**Očekivani ishod:**
+Default principal: admin@IAM.LAB
+Potvrđena administrativna autentifikacija
+Omogućeno izvođenje FreeIPA administrativnih naredbi
+________________________________________
+## 1. Provjera korisnika i omogućavanje 2FA (server)
+### 1.1 Provjera postojećih postavki korisnika ana
+```bash
+ipa user-show ana
+```
+**Svrha:**
+Provjerava postojeće postavke autentikacije korisnika (uključujući User authentication types).
+________________________________________
+
