@@ -217,6 +217,38 @@ FreeIPA sada omogućuje:
 
 ---
 
+## 9. FreeIPA klijent i SSSD (System Security Services Daemon)
+
+Dok FreeIPA poslužitelj djeluje kao centralni autoritet, klijentska komponenta je ono što omogućuje krajnjem stroju da koristi te resurse. Integracija klijenta u domenu nije samo postavljanje DNS-a, već duboka sistemska promjena u načinu na koji OS prepoznaje korisnike.
+
+### 9.1 SSSD – Mozak klijentske autentifikacije
+
+**SSSD** je ključni servis na klijentskoj strani. On služi kao posrednik između lokalnog operacijskog sustava i udaljenih servisa (LDAP, Kerberos, FreeIPA).
+
+**Glavne uloge SSSD-a:**
+
+* Caching: SSSD sprema podatke o korisnicima lokalno. Ako server nakratko postane nedostupan, korisnici se i dalje mogu prijaviti.
+
+* Offline Authentication: Omogućuje prijavu korisnika čak i kada klijent nema mrežnu vezu sa serverom.
+
+* PAM i NSS integracija: SSSD se integrira u Linux PAM (Pluggable Authentication Modules) kako bi upravljao lozinkama i sesijama, te u NSS (Name Service Switch) kako bi sustav "znao" da korisnik ivana postoji, iako nije zapisan u `/etc/passwd`.
+
+### 9.2 Proces "Enrolmenta" (Pridruživanja)
+
+Pridruživanje klijenta domeni vrši se putem alata ipa-client-install. Ovaj proces automatski:
+
+* Konfigurira SSSD za komunikaciju s IPA serverom.
+
+* Podešava Kerberos klijent (`/etc/krb5.conf`) kako bi prepoznao realm IAM.LAB.
+
+* Konfigurira PAM module kako bi omogućio automatsko kreiranje matičnih direktorija (mkhomedir) prilikom prve prijave.
+
+* Registrira klijentski stroj u DNS bazu servera te mu dodjeljuje vlastiti identitet (host principal).
+
+
+
+---
+
 ## 9. Zaključak
 
 Teorijska podloga koja čini ovaj projekt usko je vezana uz IAM sustave i njihove temeljne tehnologije.  
