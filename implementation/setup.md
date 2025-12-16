@@ -706,38 +706,63 @@ active (listening)
 ```
 OTP daemon sluša zahtjeve za TOTP autentikaciju
 ________________________________________
-## 6. Recovery postupci (incident response)
-### 6.1 Administratorska autentifikacija
+
+## 6. Sigurnosni izazovi i rješenja pri implementaciji 2FA
+
+Tijekom testiranja autentifikacije klijenta u okruženju koje koristi Kerberos, SSSD i dvofaktorsku autentifikaciju temeljenu na TOTP-u, došlo je do situacije u kojoj je sustav vraćao generičku poruku authentication failed, iako su TOTP tokeni prethodno bili uspješno kreirani te su se korisnici ranije mogli prijavljivati bez poteškoća. Razlog tomu bio je što, unatoč postojanju TOTP tokena, OTP autentifikacija nije bila eksplicitno omogućena kao dopušteni način autentifikacije za korisnički račun, uz dodatni utjecaj Kerberos cachea i stanja OTP servisa na poslužitelju.
+
+Kako bi se utvrdilo stanje OTP servisa, prvo je na poslužitelju provjerena aktivnost IPA OTP demona naredbom:
+```bash
+systemctl status ipa-otpd.socket
+```
+Nakon potvrde da je servis aktivan, bilo je potrebno izmijeniti autentifikacijsku politiku korisnika u FreeIPA sustavu te omogućiti kombiniranu autentifikaciju pomoću lozinke i jednokratne zaporke (OTP). To je učinjeno sljedećom naredbom:
+```bash
+ipa user-mod ivana --user-auth-type=password --user-auth-type=otp
+```
+Budući da Kerberos koristi mehanizam predmemoriranja vjerodajnica, promjene u autentifikacijskoj politici korisnika nisu odmah bile prepoznate na klijentskom sustavu. Zbog toga je bilo nužno ukloniti postojeće Kerberos vjerodajnice i ponovno inicijalizirati autentifikacijsku sesiju. 
+Na klijentu su izvršene sljedeće naredbe:
+```bash
+kdestroy
+kinit ivana
+```
+Nakon uspješne inicijalne autentifikacije korisnik se prijavio u svoju korisničku sesiju pomoću naredbe:
+```
+su - ivana
+```
+Tijekom postupka prijave sustav je zahtijevao dvofaktorsku autentifikaciju, pri čemu je prvi faktor bila korisnička lozinka, a drugi faktor jednokratni TOTP kod generiran aplikacijom Google Authenticator. Time je potvrđeno da je dvofaktorska autentifikacija ispravno konfigurirana i funkcionalna, te da je uzrok prethodnih pogrešaka bio u autentifikacijskoj politici i predmemoriji Kerberos vjerodajnica, a ne u samoj TOTP konfiguraciji.
+
+## 7. Recovery postupci (incident response)
+### 7.1 Administratorska autentifikacija
 ```bash
 kinit admin
 klist
 ```
 ________________________________________
-### 6.2 Identifikacija tokena kompromitirane korisnice (marta)
+### 7.2 Identifikacija tokena kompromitirane korisnice (marta)
 ```bash
 ipa otptoken-find --owner=marta
 ```
 ________________________________________
-### 6.3 Brisanje TOTP tokena po ID-u
+### 7.3 Brisanje TOTP tokena po ID-u
 ```bash
 ipa otptoken-del <TOKEN_ID>
 ```
 Uklanja kompromitirani TOTP token
 ________________________________________
-### 6.4 Otključavanje korisničkog računa
+### 7.4 Otključavanje korisničkog računa
 (u slučaju premašivanja broja neuspjelih pokušaja)
 ```bash
 ipa user-unlock marta
 ```
 ________________________________________
-### 7. Provjera sigurnosnih logova
+### 8. Provjera sigurnosnih logova
 ```bash
 journalctl -u krb5kdc | tail -n 50
 ```
 Svrha:
 Analiza pokušaja prijave, grešaka i 2FA događaja u Kerberos KDC-u.
 ________________________________________
-### 8. Sažetak
+### 9. Sažetak
 * Implementirana je 2FA autentikacija (TOTP)
 
 * Selektivna primjena po korisnicima - 2FA za administratore i samo lozinka za ostale grupe korisnika
