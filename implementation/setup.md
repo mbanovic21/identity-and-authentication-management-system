@@ -738,15 +738,15 @@ Svrha:
 Analiza pokušaja prijave, grešaka i 2FA događaja u Kerberos KDC-u.
 ________________________________________
 ### 8. Sažetak
-Implementirana 2FA autentikacija (TOTP)
+* Implementirana je 2FA autentikacija (TOTP)
 
-Selektivna primjena po korisnicima
+* Selektivna primjena po korisnicima - 2FA za administratore i samo lozinka za ostale grupe korisnika
 
-Backup tokeni za recovery
+* Backup tokeni za recovery u slučaju zaključavanja korisničkog profila ili kompromitiranja
 
-Testirana prijava korisnika
+* Testirana je prijava korisnika
 
-Definiran recovery plan
+* Definiran recovery plan
 
-Centralizirani audit kroz Kerberos logove
+* Centralizirani audit kroz Kerberos logove za praćenje prijava korisnika u sustav
 
