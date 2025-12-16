@@ -1,1 +1,21 @@
 # Final report / summary
+
+Ovaj projekt bavi se dizajnom i implementacijom centraliziranog sustava za upravljanje identitetima i autentifikacijom (Identity and Authentication Management – IAM) u Linux okruženju. Cilj projekta bio je uspostaviti siguran, skalabilan i centralno upravljan sustav koji omogućuje pouzdanu autentifikaciju korisnika, kontrolu pristupa resursima te primjenu suvremenih sigurnosnih politika.
+
+Kao jezgra sustava implementiran je FreeIPA poslužitelj na operacijskom sustavu Rocky Linux 9, unutar virtualiziranog okruženja. FreeIPA objedinjuje ključne IAM komponente, uključujući LDAP direktorijski servis za pohranu identiteta, Kerberos za sigurnu autentifikaciju i Single Sign-On (SSO), integrirani DNS te certifikacijski autoritet. Poseban naglasak stavljen je na pravilnu mrežnu i DNS konfiguraciju, sinkronizaciju vremena te verifikaciju rada Kerberos i LDAP servisa, budući da su ti elementi kritični za stabilnost sustava.
+
+U sklopu projekta definirane su i implementirane sigurnosne politike lozinki koje uključuju minimalnu duljinu i složenost lozinki, povijest lozinki, ograničenje broja neuspjelih prijava te mehanizme privremenog zaključavanja korisničkih računa. Time je osigurana osnovna razina zaštite od napada grubom silom i zlouporabe korisničkih vjerodajnica.
+
+Nadalje, uspostavljeno je upravljanje identitetima i pristupom kroz kreiranje korisnika, grupa i uloga, uz primjenu principa najmanje privilegije (PoLP). Korištenjem centraliziranih sudo pravila omogućena je precizna kontrola administrativnih ovlasti po grupama korisnika, čime se smanjuje sigurnosni rizik i olakšava upravljanje pristupom u višekorisničkom okruženju.
+
+Projekt također obuhvaća integraciju klijentskih Linux sustava u FreeIPA domenu pomoću FreeIPA klijenta i SSSD-a, čime je omogućena centralna autentifikacija korisnika, automatsko kreiranje korisničkih direktorija te primjena definirnih politika na klijentskoj strani. Posebna pažnja posvećena je pravilnoj DNS i mrežnoj konfiguraciji klijenata kako bi se osigurala ispravna Kerberos autentifikacija.
+
+Kao dodatni sigurnosni sloj implementirana je dvofaktorska autentifikacija (2FA) temeljena na TOTP mehanizmu, uz korištenje aplikacije Google Authenticator. 2FA je selektivno primijenjena na korisnike i administratore s povišenim ovlastima, a sustav uključuje i mehanizme za oporavak pristupa putem backup tokena i administrativnih procedura. Testiranjem su identificirani i dokumentirani tipični izazovi pri implementaciji 2FA, uključujući probleme s autentifikacijskom politikom korisnika, Kerberos cacheom i OTP servisima, uz definirana rješenja i recovery postupke.
+
+Rezultat projekta je funkcionalan IAM sustav koji omogućuje centralizirano upravljanje identitetima, sigurnu autentifikaciju korisnika, kontrolu pristupa resursima te auditiranje sigurnosnih događaja. Implementirano rješenje demonstrira kako se open-source tehnologije mogu učinkovito koristiti za izgradnju modernog i sigurnog identitetskog sustava primjenjivog u obrazovnim, razvojnim i produkcijskim okruženjima.
+
+# Prijedlozi poboljšanja i budući razvoj
+
+Iako implementirani sustav u potpunosti zadovoljava funkcionalne i sigurnosne zahtjeve projekta, postoji prostor za dodatna poboljšanja. Jedan od mogućih smjerova razvoja je proširenje grafičkog korisničkog sučelja (GUI) FreeIPA sustava s naprednijim mogućnostima upravljanja dvofaktorskom autentifikacijom. Trenutno se dio 2FA funkcionalnosti, poput detaljnog upravljanja TOTP tokenima i autentifikacijskim tipovima korisnika, primarno provodi putem CLI alata, dok bi njihova integracija u GUI značajno povećala preglednost i praktičnost administracije, osobito za manje iskusne administratore.
+
+Dodatno, projekt je u trenutnoj fazi realiziran unutar lokalnog virtualiziranog okruženja na jednom fizičkom računalu, gdje su poslužitelj i klijenti smješteni na istoj host platformi. Kao buduće poboljšanje predlaže se implementacija sustava u realističnijem okruženju, pri čemu bi FreeIPA poslužitelj i klijentski sustavi bili raspoređeni na zasebnim fizičkim ili virtualnim računalima povezanima putem stvarne mreže. Takav pristup omogućio bi vjerodostojnije testiranje sigurnosnih mehanizama, mrežnih politika i otpornosti sustava, te bi dodatno povećao primjenjivost rješenja u produkcijskim scenarijima.
